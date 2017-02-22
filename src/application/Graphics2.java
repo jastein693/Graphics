@@ -99,7 +99,7 @@ public class Graphics2 extends Application {
 							inputImage2Jfx = new Image(new FileInputStream(file));
 							
 							 outputImageJfx.combine(inputImage2Jfx);
-							 outputImageJfx.save();
+							 //outputImageJfx.save();
 							 
 							 inputImageView2 = new ImageView(inputImage2Jfx);
 							 outputImageView = new ImageView(outputImageJfx);
@@ -128,7 +128,7 @@ public class Graphics2 extends Application {
 						
 						outputImage3Jfx.copyFrom(outputImageJfx);
 						 outputImage3Jfx.blur(n);
-						 outputImage3Jfx.save();
+						 //outputImage3Jfx.save();
 						 
 						 inputImageView2 = new ImageView(outputImage3Jfx);
 						 root.add(inputImageView2, 0, 2);

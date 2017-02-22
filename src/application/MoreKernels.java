@@ -11,23 +11,20 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.application.Application;
-import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.image.WritableImage;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import javax.imageio.ImageIO;
 
 public class MoreKernels extends Application {
     
@@ -66,10 +63,12 @@ public class MoreKernels extends Application {
         VBox menuPane = new VBox();
         HBox hb = new HBox();
         
-        Button openButton = new Button("Open Picture 1");
-    	Button openButton2 = new Button("Open Picture 2");
+        Button openButton = new Button("Open Picture");
+    	Button openButton2 = new Button("Overlay picture");
+    	Button openButton3 = new Button("Save picture");
         
         TextField textField = new TextField ();
+        Label label = new Label("Method Value:");
     	
     	fileChooser.setTitle("Open picture");
         
@@ -78,7 +77,11 @@ public class MoreKernels extends Application {
         hb.setSpacing(10);
         hb.getChildren().add(openButton);
         hb.getChildren().add(openButton2);
+        hb.getChildren().add(label);
         hb.getChildren().add(textField);
+        hb.getChildren().add(openButton3);
+        
+        textField.setText("1");
         
         openButton.setOnAction(
 	        new EventHandler<ActionEvent>() {
@@ -88,12 +91,35 @@ public class MoreKernels extends Application {
 	                File file = fileChooser.showOpenDialog(primaryStage);
 	                if (file != null) {
 	                	try {
-                                    inputImageJfx = new Image(new FileInputStream(file));
+                                inputImageJfx = new Image(new FileInputStream(file));
 
-                                    outputImageJfx = new MyImage((int)inputImageJfx.getWidth(), (int)inputImageJfx.getHeight());
+                                outputImageJfx = new MyImage((int)inputImageJfx.getWidth(), (int)inputImageJfx.getHeight());
 
-                                    outputImageJfx.copyFrom(inputImageJfx);
+                                outputImageJfx.copyFrom(inputImageJfx);
 
+                                //inputImageView = new ImageView(inputImageJfx);
+
+                                outputImageView.setImage(outputImageJfx);
+
+                                } catch (FileNotFoundException e1) {
+                                        // TODO Auto-generated catch block
+                                        e1.printStackTrace();
+                                }
+	                }
+	            }
+	        });
+        
+        openButton2.setOnAction(
+    	        new EventHandler<ActionEvent>() {
+    	            @Override
+    	            public void handle(final ActionEvent e) {
+    	            	//ImageView inputImageView;
+    	                File file = fileChooser.showOpenDialog(primaryStage);
+    	                if (file != null) {
+    	                	try {
+                                    Image inputImageJfx2 = new Image(new FileInputStream(file));
+                                    	
+                                    outputImageJfx.combine(inputImageJfx2);
                                     //inputImageView = new ImageView(inputImageJfx);
 
                                     outputImageView.setImage(outputImageJfx);
@@ -102,9 +128,23 @@ public class MoreKernels extends Application {
                                             // TODO Auto-generated catch block
                                             e1.printStackTrace();
                                     }
-	                }
-	            }
-	        });
+    	                }
+    	            }
+    	        });
+        
+        openButton3.setOnAction(
+    	        new EventHandler<ActionEvent>() {
+    	            @Override
+    	            public void handle(final ActionEvent e) {
+    	            	//ImageView inputImageView;
+    	                File file = fileChooser.showSaveDialog(primaryStage);
+    	                if (file != null) {
+    	                	
+    	                	outputImageJfx.save(file);
+                                 
+    	                }
+    	            }
+    	        });
         
         for(Method method : outputImageJfx.getClass().getDeclaredMethods())
         {
@@ -112,39 +152,37 @@ public class MoreKernels extends Application {
                 continue;
             }
             
-            
-            Button button = new Button(method.getName());
-            button.setOnAction(
-                    new EventHandler<ActionEvent>(){
-                    @Override
-                    public void handle(ActionEvent event) {
-                        try {  
-                            
-                            MyImage newImage = new MyImage((int)inputImageJfx.getWidth(), (int)inputImageJfx.getHeight());
-                            
-                            newImage.copyFrom(outputImageJfx);
-                            
-                            undoStack.add(outputImageJfx);
-                            
-                            outputImageJfx = newImage;
-                            
-                            
-                            
-                            
-                            method.invoke(outputImageJfx, new Object[]{1});
-                            
-                            outputImageView.setImage(outputImageJfx);
-                            
-                        } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
-                            Logger.getLogger(MoreKernels.class.getName()).log(Level.SEVERE, null, ex);
-                        }
-                    }
-
-                }
-            );
-            
-            
-            menuPane.getChildren().add(button);
+            if(method.getName() != "save" && method.getName() != "combine" && method.getName() != "copyFrom") {   
+	            Button button = new Button(method.getName());
+	            button.setOnAction(
+	                    new EventHandler<ActionEvent>(){
+	                    @Override
+	                    public void handle(ActionEvent event) {
+	                        try {  
+	                            
+	                            MyImage newImage = new MyImage((int)inputImageJfx.getWidth(), (int)inputImageJfx.getHeight());
+	                            
+	                            newImage.copyFrom(outputImageJfx);
+	                            
+	                            undoStack.add(outputImageJfx);
+	                            
+	                            outputImageJfx = newImage;
+	                            
+	                            int n = Integer.parseInt(textField.getText());
+	                            
+	                            method.invoke(outputImageJfx, new Object[]{n});
+	                            
+	                            outputImageView.setImage(outputImageJfx);
+	                            
+	                        } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
+	                            Logger.getLogger(MoreKernels.class.getName()).log(Level.SEVERE, null, ex);
+	                        }
+	                    }
+	                    
+	                }
+	            );
+	            menuPane.getChildren().add(button);
+            }
         }
         
         
@@ -156,7 +194,7 @@ public class MoreKernels extends Application {
         root.setLeft(menuPane);
         root.setTop(hb);
         
-        Scene scene = new Scene(root, 400, 20 );
+        Scene scene = new Scene(root, 700, 700 );
         
         primaryStage.setTitle("Duplicates");
         primaryStage.setScene(scene);

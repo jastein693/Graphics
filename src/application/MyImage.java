@@ -8,7 +8,6 @@ package application;
 import java.awt.image.RenderedImage;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.embed.swing.SwingFXUtils;
@@ -37,10 +36,10 @@ public class MyImage extends WritableImage{
         }
     }
     
-    public void save(){
+    public void save(File file){
         RenderedImage renderedImage = SwingFXUtils.fromFXImage(this, null);
         try {
-            ImageIO.write(renderedImage, "PNG", new File(System.getProperty("user.home") + "/Desktop/newPhoto.png") );
+            ImageIO.write(renderedImage, "png", file );
         } catch (IOException ex) {
             Logger.getLogger(MyImage.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -286,4 +285,44 @@ public class MyImage extends WritableImage{
          }
         
     }
+    
+    public void rotate(float degrees) {
+    	Color[][] newColors = new Color[(int) this.getHeight()][(int) this.getWidth()];
+    	
+    	int halfHeight = (int) (this.getHeight() / 2);
+    	int halfWidth = (int) (this.getWidth() / 2);
+    	
+    	float rad = (float) Math.toRadians(degrees);
+    	
+    	 for(int y = 0; y < this.getHeight() ;  y++)
+         {
+             for(int x = 0; x < this.getWidth() ; x++)
+             {
+            	
+				int tmp = (int) Math.round((x - halfWidth) * Math.cos(rad) - (-y + halfHeight) * Math.sin(rad));
+				int yNew = (int) Math.round((x - halfWidth) * Math.sin(rad) + (-y + halfHeight) * Math.cos(rad));
+				int xNew = tmp;
+				
+				xNew += halfWidth;
+				yNew = -(yNew - halfHeight);
+				
+				if(yNew < this.getHeight() && yNew >= 0 && xNew < this.getWidth() && xNew >= 0) {
+					newColors[yNew][xNew] = this.getPixelReader().getColor(x, y);
+				}
+             }
+         }
+    	 
+    	 for(int y = 0; y < this.getHeight() ;  y++)
+         {
+             for(int x = 0; x < this.getWidth() ; x++)
+             {
+            	 if(newColors[y][x] == null) {
+            		 this.getPixelWriter().setColor(x, y, Color.BLACK);
+            	 }else{
+            		 this.getPixelWriter().setColor(x, y, newColors[y][x]);
+            	 }
+             }
+         }
+	}
+
 }

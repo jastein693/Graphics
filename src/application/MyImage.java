@@ -292,7 +292,7 @@ public class MyImage extends WritableImage{
     	int halfHeight = (int) (this.getHeight() / 2);
     	int halfWidth = (int) (this.getWidth() / 2);
     	
-    	float rad = (float) Math.toRadians(degrees);
+    	float rad = -(float) Math.toRadians(degrees);
     	
     	 for(int y = 0; y < this.getHeight() ;  y++)
          {
@@ -317,12 +317,163 @@ public class MyImage extends WritableImage{
              for(int x = 0; x < this.getWidth() ; x++)
              {
             	 if(newColors[y][x] == null) {
-            		 this.getPixelWriter().setColor(x, y, Color.BLACK);
+            		 this.getPixelWriter().setColor(x, y, Color.WHITE);
             	 }else{
             		 this.getPixelWriter().setColor(x, y, newColors[y][x]);
             	 }
              }
          }
 	}
+    
+    public MyImage addBorder(int size) {
+    	Color[][] newColors = new Color[(int) this.getHeight()][(int) this.getWidth()];
+    	for(int y = 0; y < this.getHeight() ;  y++)
+        {
+            for(int x = 0; x < this.getWidth() ; x++)
+            {
+            	
+            	newColors[y][x] = this.getPixelReader().getColor(x, y);
+            }
+        }
+    	
+    	MyImage newImage = new MyImage((int)this.getWidth() + (size * 2), (int)this.getHeight() + (size * 2));
+    	
+    	for(int y = 0; y < newImage.getHeight() ;  y++)
+        {
+            for(int x = 0; x < newImage.getWidth() ; x++)
+            {
+            	if(x < size || x >= size + this.getWidth() || y < size || y >= size + this.getHeight()) {
+            		newImage.getPixelWriter().setColor(x, y, Color.WHITE);
+            	}else{
+            		newImage.getPixelWriter().setColor(x, y, newColors[y-size][x-size]);
+            	}
+            }
+        }
+    	return newImage;
+    }
+    
+    public void verticalFlip(int i) {
+    	Color[][] newColors = new Color[(int) this.getHeight()][(int) this.getWidth()];
+    	for(int y = 0; y < this.getHeight() ;  y++)
+        {
+            for(int x = 0; x < this.getWidth() ; x++)
+            {
+            	
+            	newColors[y][x] = this.getPixelReader().getColor(x, y);
+            }
+        }
+    	
+    	for(int y = 0; y < this.getHeight() ;  y++)
+        {
+            for(int x = 0; x < this.getWidth() ; x++)
+            {
+            	
+            	this.getPixelWriter().setColor(x, y, newColors[((int)this.getHeight() - 1) - y][x]);
+            }
+        }
+    }
 
+    public void horizontalFlip(int i) {
+    	Color[][] newColors = new Color[(int) this.getHeight()][(int) this.getWidth()];
+    	for(int y = 0; y < this.getHeight() ;  y++)
+        {
+            for(int x = 0; x < this.getWidth() ; x++)
+            {
+            	
+            	newColors[y][x] = this.getPixelReader().getColor(x, y);
+            }
+        }
+    	
+    	for(int y = 0; y < this.getHeight() ;  y++)
+        {
+            for(int x = 0; x < this.getWidth() ; x++)
+            {
+            	
+            	this.getPixelWriter().setColor(x, y, newColors[y][((int)this.getWidth() - 1) - x]);
+            }
+        }
+    }
+    
+    public void grayScale(int i) {
+    	
+    	for(int y = 0; y < this.getHeight() ;  y++)
+        {
+            for(int x = 0; x < this.getWidth() ; x++)
+            {
+            	
+            	double red = this.getPixelReader().getColor(x, y).getRed() * 0.2126;
+            	double green = this.getPixelReader().getColor(x, y).getGreen() * 0.7152;
+            	double blue = this.getPixelReader().getColor(x, y).getBlue() * 0.0722;
+            	double gray = red + green + blue;
+            	this.getPixelWriter().setColor(x, y, new Color(gray,gray,gray,1));
+            }
+        }
+    }
+    
+    public void setRed(double red) {
+    	for(int y = 0; y < this.getHeight() ;  y++)
+        {
+            for(int x = 0; x < this.getWidth() ; x++)
+            {
+            	this.getPixelWriter().setColor(x, y, new Color(red,this.getPixelReader().getColor(x, y).getGreen(),this.getPixelReader().getColor(x, y).getBlue(),1));
+            }
+        }
+    }
+    
+    public void setGreen(double green) {
+    	for(int y = 0; y < this.getHeight() ;  y++)
+        {
+            for(int x = 0; x < this.getWidth() ; x++)
+            {
+            	this.getPixelWriter().setColor(x, y, new Color(this.getPixelReader().getColor(x, y).getRed(),green,this.getPixelReader().getColor(x, y).getBlue(),1));
+            }
+        }
+    }
+    
+    public void setBlue(double blue) {
+    	for(int y = 0; y < this.getHeight() ;  y++)
+        {
+            for(int x = 0; x < this.getWidth() ; x++)
+            {
+            	this.getPixelWriter().setColor(x, y, new Color(this.getPixelReader().getColor(x, y).getRed(), this.getPixelReader().getColor(x, y).getGreen(), blue, 1));
+            }
+        }
+    }
+    
+    public MyImage grow(float w) {
+    	MyImage newImage = new MyImage((int)(this.getWidth() * w), (int)(this.getHeight() * w));
+    	for(int y = 0; y < newImage.getHeight() - w;  y++)
+        {
+            for(int x = 0; x < newImage.getWidth() - w; x++)
+            {
+                ///Where on the original photo I'm sampling
+                float x_old = (x/w);
+                float y_old = (y/w);
+                
+                Color cFirst = this.getPixelReader().getColor((int)x_old, (int)y_old );
+                Color cSecond =  this.getPixelReader().getColor((int)x_old + 1, (int)y_old  );
+                Color cThird = this.getPixelReader().getColor((int)x_old, (int)y_old + 1);
+                Color cFourth =  this.getPixelReader().getColor((int)x_old + 1, (int)y_old  + 1);
+                
+                float iValueX = (float)(x/w) -  (int)(x/w);
+                float iValueY = (float)(y/w) -  (int)(y/w);
+                
+                Color iPixelOne = interpolate(iValueX, cFirst, cSecond);
+                Color iPixelTwo = interpolate(iValueX, cThird, cFourth);
+                
+                Color iPixelFinal = interpolate(iValueY, iPixelOne, iPixelTwo);
+                
+                newImage.getPixelWriter().setColor(x, y, iPixelFinal);
+            }
+        }
+    	return newImage;
+    }
+    
+    private static Color interpolate(float iValue, Color cFirst, Color cSecond) {
+        double iRed = ((1 - iValue) * cFirst.getRed() + iValue * cSecond.getRed());
+        double iGreen = ((1 - iValue) * cFirst.getGreen() + iValue * cSecond.getGreen());
+        double iBlue = ((1 - iValue) * cFirst.getBlue() + iValue * cSecond.getBlue());
+        Color iColor = new Color(iRed, iGreen, iBlue, 1);
+        return iColor;
+    }
 }

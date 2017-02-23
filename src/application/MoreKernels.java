@@ -11,12 +11,15 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.application.Application;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -62,6 +65,7 @@ public class MoreKernels extends Application {
       
         VBox menuPane = new VBox();
         HBox hb = new HBox();
+        HBox hb2 = new HBox();
         
         Button openButton = new Button("Open Picture");
     	Button openButton2 = new Button("Overlay picture");
@@ -69,7 +73,29 @@ public class MoreKernels extends Application {
         
         TextField textField = new TextField ();
         Label label = new Label("Method Value:");
+        
+        Label red = new Label("Red:");
+        Label green = new Label("Green:");
+        Label blue = new Label("Blue:");
     	
+        Slider sliderRed = new Slider();
+        sliderRed.setMin(0);
+        sliderRed.setMax(1);
+        sliderRed.setShowTickLabels(true);
+        sliderRed.setShowTickMarks(true);
+        
+        Slider sliderGreen = new Slider();
+        sliderGreen.setMin(0);
+        sliderGreen.setMax(1);
+        sliderGreen.setShowTickLabels(true);
+        sliderGreen.setShowTickMarks(true);
+        
+        Slider sliderBlue = new Slider();
+        sliderBlue.setMin(0);
+        sliderBlue.setMax(1);
+        sliderBlue.setShowTickLabels(true);
+        sliderBlue.setShowTickMarks(true);
+        
     	fileChooser.setTitle("Open picture");
         
         hb.setPadding(new Insets(10, 10, 10, 10));
@@ -80,6 +106,16 @@ public class MoreKernels extends Application {
         hb.getChildren().add(label);
         hb.getChildren().add(textField);
         hb.getChildren().add(openButton3);
+        
+        hb2.setPadding(new Insets(10, 10, 10, 10));
+        hb2.setStyle("-fx-background-color: DFE699;");
+        hb2.setSpacing(10);
+        hb2.getChildren().add(red);
+        hb2.getChildren().add(sliderRed);
+        hb2.getChildren().add(green);
+        hb2.getChildren().add(sliderGreen);
+        hb2.getChildren().add(blue);
+        hb2.getChildren().add(sliderBlue);
         
         textField.setText("1");
         
@@ -152,7 +188,7 @@ public class MoreKernels extends Application {
                 continue;
             }
             
-            if(method.getName() != "save" && method.getName() != "combine" && method.getName() != "copyFrom") {   
+            if(method.getName() != "save" && method.getName() != "combine" && method.getName() != "copyFrom" && method.getName() != "setRed"  && method.getName() != "setGreen" && method.getName() != "setBlue" ) {   
 	            Button button = new Button(method.getName());
 	            button.setOnAction(
 	                    new EventHandler<ActionEvent>(){
@@ -160,7 +196,7 @@ public class MoreKernels extends Application {
 	                    public void handle(ActionEvent event) {
 	                        try {  
 	                            
-	                            MyImage newImage = new MyImage((int)inputImageJfx.getWidth(), (int)inputImageJfx.getHeight());
+	                            MyImage newImage = new MyImage((int)outputImageJfx.getWidth(), (int)outputImageJfx.getHeight());
 	                            
 	                            newImage.copyFrom(outputImageJfx);
 	                            
@@ -170,7 +206,13 @@ public class MoreKernels extends Application {
 	                            
 	                            int n = Integer.parseInt(textField.getText());
 	                            
-	                            method.invoke(outputImageJfx, new Object[]{n});
+	                            if(method.getName() == "addBorder") {
+	                            	outputImageJfx = outputImageJfx.addBorder(n);
+	                            }else if(method.getName() == "grow") {
+	                            	outputImageJfx = outputImageJfx.grow(n);
+	                            }else{
+	                            	method.invoke(outputImageJfx, new Object[]{n});
+	                            }
 	                            
 	                            outputImageView.setImage(outputImageJfx);
 	                            
@@ -185,6 +227,27 @@ public class MoreKernels extends Application {
             }
         }
         
+        sliderRed.valueProperty().addListener(new ChangeListener<Number>() {
+            public void changed(ObservableValue<? extends Number> ov,
+                Number old_val, Number new_val) {
+            		outputImageJfx.setRed(new_val.doubleValue());
+            }
+        });
+        
+        sliderGreen.valueProperty().addListener(new ChangeListener<Number>() {
+            public void changed(ObservableValue<? extends Number> ov,
+                Number old_val, Number new_val) {
+            		outputImageJfx.setGreen(new_val.doubleValue());
+            }
+        });
+        
+        sliderBlue.valueProperty().addListener(new ChangeListener<Number>() {
+            public void changed(ObservableValue<? extends Number> ov,
+                Number old_val, Number new_val) {
+            		outputImageJfx.setBlue(new_val.doubleValue());
+            }
+        });
+        
         
         BorderPane root = new BorderPane();
         root.setPadding(new Insets(10, 10, 10, 10));
@@ -193,8 +256,9 @@ public class MoreKernels extends Application {
         
         root.setLeft(menuPane);
         root.setTop(hb);
+        root.setBottom(hb2);
         
-        Scene scene = new Scene(root, 700, 700 );
+        Scene scene = new Scene(root, 1920, 1080 );
         
         primaryStage.setTitle("Duplicates");
         primaryStage.setScene(scene);

@@ -19,6 +19,7 @@ import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.Separator;
 import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
@@ -119,6 +120,55 @@ public class MoreKernels extends Application {
         
         textField.setText("1");
         
+        Button undoButton = new Button("Undo");
+        undoButton.setOnAction(new EventHandler<ActionEvent>(){
+            @Override
+            public void handle(ActionEvent event) {
+                
+                
+                if(undoStack.size() > 0)
+                {
+                    MyImage previousImage = undoStack.get(undoStack.size() - 1);
+                    undoStack.remove(undoStack.size() - 1);
+                    
+                    redoStack.add(outputImageJfx);
+                    
+                    outputImageJfx = previousImage;
+                            
+                            
+                    outputImageView.setImage(outputImageJfx);
+                    
+                    
+                }
+                
+            }
+        });
+        menuPane.getChildren().add(undoButton);
+        
+        Button redoButton = new Button("Redo");
+        redoButton.setOnAction(new EventHandler<ActionEvent>(){
+            @Override
+            public void handle(ActionEvent event) {
+                if(redoStack.size() > 0)
+                {
+                    MyImage previousImage = redoStack.get(redoStack.size() - 1);
+                    redoStack.remove(redoStack.size() - 1);
+                    
+                    undoStack.add(outputImageJfx);
+                    
+                    outputImageJfx = previousImage;
+                            
+                            
+                    outputImageView.setImage(outputImageJfx);
+                    
+                    
+                }
+            }
+        });
+        menuPane.getChildren().add(redoButton);
+        
+        menuPane.getChildren().add(new Separator());
+        
         openButton.setOnAction(
 	        new EventHandler<ActionEvent>() {
 	            @Override
@@ -201,6 +251,8 @@ public class MoreKernels extends Application {
 	                            newImage.copyFrom(outputImageJfx);
 	                            
 	                            undoStack.add(outputImageJfx);
+	                            
+	                            redoStack.clear();
 	                            
 	                            outputImageJfx = newImage;
 	                            

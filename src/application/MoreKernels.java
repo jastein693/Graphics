@@ -78,6 +78,10 @@ public class MoreKernels extends Application {
         Label red = new Label("Red:");
         Label green = new Label("Green:");
         Label blue = new Label("Blue:");
+        Label hue = new Label("Hue:");
+        Label saturation = new Label("Saturation:");
+        Label brightness = new Label("Brightness:");
+        Label opacity = new Label("Opacity:");
     	
         Slider sliderRed = new Slider();
         sliderRed.setMin(0);
@@ -96,6 +100,30 @@ public class MoreKernels extends Application {
         sliderBlue.setMax(1);
         sliderBlue.setShowTickLabels(true);
         sliderBlue.setShowTickMarks(true);
+        
+        Slider sliderHue = new Slider();
+        sliderHue.setMin(0);
+        sliderHue.setMax(360);
+        sliderHue.setShowTickLabels(true);
+        sliderHue.setShowTickMarks(true);
+        
+        Slider sliderSaturation = new Slider();
+        sliderSaturation.setMin(0);
+        sliderSaturation.setMax(1);
+        sliderSaturation.setShowTickLabels(true);
+        sliderSaturation.setShowTickMarks(true);
+        
+        Slider sliderBrightness = new Slider();
+        sliderBrightness.setMin(0);
+        sliderBrightness.setMax(1);
+        sliderBrightness.setShowTickLabels(true);
+        sliderBrightness.setShowTickMarks(true);
+        
+        Slider sliderOpacity = new Slider();
+        sliderOpacity.setMin(0);
+        sliderOpacity.setMax(1);
+        sliderOpacity.setShowTickLabels(true);
+        sliderOpacity.setShowTickMarks(true);
         
     	fileChooser.setTitle("Open picture");
         
@@ -117,6 +145,14 @@ public class MoreKernels extends Application {
         hb2.getChildren().add(sliderGreen);
         hb2.getChildren().add(blue);
         hb2.getChildren().add(sliderBlue);
+        hb2.getChildren().add(hue);
+        hb2.getChildren().add(sliderHue);
+        hb2.getChildren().add(saturation);
+        hb2.getChildren().add(sliderSaturation);
+        hb2.getChildren().add(brightness);
+        hb2.getChildren().add(sliderBrightness);
+        hb2.getChildren().add(opacity);
+        hb2.getChildren().add(sliderOpacity);
         
         textField.setText("1");
         
@@ -262,6 +298,8 @@ public class MoreKernels extends Application {
 	                            	outputImageJfx = outputImageJfx.addBorder(n);
 	                            }else if(method.getName() == "grow") {
 	                            	outputImageJfx = outputImageJfx.grow(n);
+	                            }else if(method.getName() == "shrink") {
+	                            	outputImageJfx = outputImageJfx.shrink(n);
 	                            }else{
 	                            	method.invoke(outputImageJfx, new Object[]{n});
 	                            }
@@ -297,6 +335,34 @@ public class MoreKernels extends Application {
             public void changed(ObservableValue<? extends Number> ov,
                 Number old_val, Number new_val) {
             		outputImageJfx.setBlue(new_val.doubleValue());
+            }
+        });
+        
+        sliderHue.valueProperty().addListener(new ChangeListener<Number>() {
+            public void changed(ObservableValue<? extends Number> ov,
+                Number old_val, Number new_val) {
+            		outputImageJfx.setHue(new_val.doubleValue());
+            }
+        });
+        
+        sliderSaturation.valueProperty().addListener(new ChangeListener<Number>() {
+            public void changed(ObservableValue<? extends Number> ov,
+                Number old_val, Number new_val) {
+            		outputImageJfx.setSaturation(new_val.doubleValue());
+            }
+        });
+        
+        sliderBrightness.valueProperty().addListener(new ChangeListener<Number>() {
+            public void changed(ObservableValue<? extends Number> ov,
+                Number old_val, Number new_val) {
+            		outputImageJfx.setBrightness(new_val.doubleValue());
+            }
+        });
+        
+        sliderOpacity.valueProperty().addListener(new ChangeListener<Number>() {
+            public void changed(ObservableValue<? extends Number> ov,
+                Number old_val, Number new_val) {
+            		outputImageJfx.setOpacity(new_val.doubleValue());
             }
         });
         

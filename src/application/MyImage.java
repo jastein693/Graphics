@@ -299,8 +299,8 @@ public class MyImage extends WritableImage{
              for(int x = 0; x < this.getWidth() ; x++)
              {
             	
-				int tmp = (int) Math.round((x - halfWidth) * Math.cos(rad) - (-y + halfHeight) * Math.sin(rad));
-				int yNew = (int) Math.round((x - halfWidth) * Math.sin(rad) + (-y + halfHeight) * Math.cos(rad));
+				int tmp = (int) ((x - halfWidth) * Math.cos(rad) - (-y + halfHeight) * Math.sin(rad));
+				int yNew = (int)((x - halfWidth) * Math.sin(rad) + (-y + halfHeight) * Math.cos(rad));
 				int xNew = tmp;
 				
 				xNew += halfWidth;
@@ -440,6 +440,46 @@ public class MyImage extends WritableImage{
         }
     }
     
+    public void setHue(double hue) {
+    	for(int y = 0; y < this.getHeight() ;  y++)
+        {
+            for(int x = 0; x < this.getWidth() ; x++)
+            {
+            	this.getPixelWriter().setColor(x, y, javafx.scene.paint.Color.hsb(hue, this.getPixelReader().getColor(x, y).getSaturation(), this.getPixelReader().getColor(x, y).getBrightness()));
+            }
+        }
+    }
+    
+    public void setSaturation(double saturation) {
+    	for(int y = 0; y < this.getHeight() ;  y++)
+        {
+            for(int x = 0; x < this.getWidth() ; x++)
+            {
+            	this.getPixelWriter().setColor(x, y, javafx.scene.paint.Color.hsb(this.getPixelReader().getColor(x, y).getHue(), saturation, this.getPixelReader().getColor(x, y).getBrightness()));
+            }
+        }
+    }
+    
+    public void setBrightness(double brightness) {
+    	for(int y = 0; y < this.getHeight() ;  y++)
+        {
+            for(int x = 0; x < this.getWidth() ; x++)
+            {
+            	this.getPixelWriter().setColor(x, y, javafx.scene.paint.Color.hsb(this.getPixelReader().getColor(x, y).getHue(), this.getPixelReader().getColor(x, y).getSaturation(), brightness));
+            }
+        }
+    }
+    
+    public void setOpacity(double opacity) {
+    	for(int y = 0; y < this.getHeight() ;  y++)
+        {
+            for(int x = 0; x < this.getWidth() ; x++)
+            {
+            	this.getPixelWriter().setColor(x, y, javafx.scene.paint.Color.hsb(this.getPixelReader().getColor(x, y).getHue(), this.getPixelReader().getColor(x, y).getSaturation(), this.getPixelReader().getColor(x, y).getBrightness(), opacity));
+            }
+        }
+    }
+    
     public MyImage grow(float w) {
     	MyImage newImage = new MyImage((int)(this.getWidth() * w), (int)(this.getHeight() * w));
     	for(int y = 0; y < newImage.getHeight() - w;  y++)
@@ -464,6 +504,18 @@ public class MyImage extends WritableImage{
                 Color iPixelFinal = interpolate(iValueY, iPixelOne, iPixelTwo);
                 
                 newImage.getPixelWriter().setColor(x, y, iPixelFinal);
+            }
+        }
+    	return newImage;
+    }
+    
+    public MyImage shrink(float w) {
+    	MyImage newImage = new MyImage((int)(this.getWidth() / w), (int)(this.getHeight() / w));
+    	for(int y = 0; y < this.getHeight() - w;  y += w)
+        {
+            for(int x = 0; x < this.getWidth() - w; x += w)
+            {   
+                newImage.getPixelWriter().setColor((int)(x/w), (int)(y/w), this.getPixelReader().getColor(x, y));
             }
         }
     	return newImage;
